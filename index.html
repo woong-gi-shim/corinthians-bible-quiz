@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>고린도전서 성경퀴즈 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0EA; --surface:#FFFFFF; --ink:#1E2722; --muted:#5E6B63; --line:#D3DACF;
+  --accent:#2F6B5A; --accent-ink:#FFFFFF; --slot:#B8892B; --slot-bg:#F6EED9;
+  --ok:#2F7A4C; --ok-bg:#E3F1E7; --bad:#A93545; --bad-bg:#F8E4E6;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141A17; --surface:#1D2521; --ink:#E6ECE7; --muted:#9AA79F; --line:#33403A;
+    --accent:#6FB39C; --accent-ink:#0F1613; --slot:#E0B45A; --slot-bg:#2C2718;
+    --ok:#7CCB98; --ok-bg:#1C3125; --bad:#F08A97; --bad-bg:#3A1F24;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141A17; --surface:#1D2521; --ink:#E6ECE7; --muted:#9AA79F; --line:#33403A;
+  --accent:#6FB39C; --accent-ink:#0F1613; --slot:#E0B45A; --slot-bg:#2C2718;
+  --ok:#7CCB98; --ok-bg:#1C3125; --bad:#F08A97; --bad-bg:#3A1F24;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:20px 18px 40px}
+h1{font-family:"Gowun Batang",serif;font-weight:700;font-size:1.9rem;line-height:1.25;margin:18px 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.choice{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;
+  text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;
+  padding:14px 16px;margin-bottom:10px;font:inherit;color:inherit;cursor:pointer}
+.choice[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.choice b{font-weight:600}
+.choice span{color:var(--muted);font-size:.9rem;white-space:nowrap}
+.toggle{display:flex;align-items:center;gap:10px;margin:14px 2px 20px;color:var(--muted);font-size:.95rem}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:15px 16px;font:inherit;font-weight:600;
+  background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:1.02rem}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);font-weight:500}
+.btn + .btn{margin-top:10px}
+.btn:focus-visible,.choice:focus-visible,input:focus-visible,.link:focus-visible{outline:3px solid var(--slot);outline-offset:2px}
+.resume{margin-bottom:22px}
+.resume p{margin:0 0 12px}
+
+/* question */
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.9rem;color:var(--muted)}
+.link{background:none;border:0;color:var(--muted);font:inherit;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.bar{height:4px;background:var(--line);border-radius:2px;margin:10px 0 26px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.where{font-size:.9rem;color:var(--accent);font-weight:600;margin-bottom:10px}
+.round{display:inline-block;margin-left:8px;color:var(--bad);font-weight:600}
+.verse{font-family:"Gowun Batang",serif;font-size:1.42rem;line-height:1.85;margin:0 0 28px;word-break:keep-all}
+.slot{display:inline-block;min-width:4.2em;padding:0 .35em;margin:0 .1em;border-bottom:2.5px solid var(--slot);
+  background:var(--slot-bg);border-radius:4px 4px 0 0;text-align:center;color:var(--slot);font-weight:700;line-height:1.5}
+.slot.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.slot.bad{color:var(--bad);border-color:var(--bad);background:var(--bad-bg)}
+.answer{width:100%;font:inherit;font-size:1.15rem;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--surface);color:var(--ink);margin-bottom:12px}
+.answer:disabled{opacity:.7}
+.fb{border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb strong{display:block;font-size:1.1rem;margin-bottom:2px}
+.fb .mine{color:var(--muted);font-size:.92rem}
+.fb .link{color:inherit;margin-top:6px}
+
+/* result */
+.score{font-family:"Gowun Batang",serif;font-size:3.4rem;font-weight:700;line-height:1;margin:22px 0 4px}
+.score small{font-size:1.4rem;color:var(--muted);font-weight:400}
+.wrong-list{list-style:none;padding:0;margin:20px 0 24px}
+.wrong-list li{border-top:1px solid var(--line);padding:12px 2px;font-size:.95rem}
+.wrong-list li:last-child{border-bottom:1px solid var(--line)}
+.wrong-list .w{color:var(--muted);font-size:.85rem}
+.wrong-list .a{color:var(--accent);font-weight:600}
+.allclear{background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:16px;margin:20px 0}
+.hidden{display:none}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+// ── 문제 데이터 ─────────────────────────────────────
+// t: 문장(빈칸은 ___), a: 인정 답안(첫 번째가 대표 정답), c: 장
+const SUMMARY = [
+ [1,'바울은 분쟁하는 교회에 ___의 도를 전했어요.',['십자가']],
+ [1,'십자가의 메시지는 부르심 받은 자에게 하나님의 ___이요 지혜예요.',['능력']],
+ [1,'그러므로 오직 십자가만이 ___ 거리예요.',['자랑']],
+ [2,'바울은 말의 지혜가 아니라 ___의 나타남과 능력으로 전했어요.',['성령']],
+ [2,'성령은 하나님의 ___까지 통달하세요.',['깊은 것','깊은것']],
+ [2,'우리는 ___의 마음을 가졌어요.',['그리스도','예수 그리스도']],
+ [3,'성도는 육신에 속한 영적 ___ 같았지만,',['유아','어린아이','어린 아이']],
+ [3,'성도는 하나님의 ___이에요.',['성전']],
+ [3,'하나님의 성전인 성도 안에 ___이 거하세요.',['성령','하나님의 성령']],
+ [4,'사람은 자신의 주인에게 ___할 청지기예요.',['충성']],
+ [4,'사람은 자신의 주인에게 충성할 ___예요.',['청지기','일꾼','맡은 자','맡은자']],
+ [4,'우리를 심판하시는 분은 ___이세요.',['주님','주','주께서']],
+ [5,'교회 안에 ___하는 사람이 있는데도 교회는 그를 방치했어요.',['음행']],
+ [5,'적은 ___이 온 덩어리를 부풀게 하니 묵은 것을 내버려야 해요.',['누룩']],
+ [5,'우리의 유월절 ___ 곧 그리스도께서 희생되셨기 때문이에요.',['양','어린 양','어린양']],
+ [6,'성도끼리 ___ 법정에 가서는 안 돼요.',['세상','세상 법정']],
+ [6,'우리 몸은 그리스도의 ___이며, 성령의 전이에요.',['지체']],
+ [6,'우리 몸은 그리스도의 지체이며, ___의 전이에요.',['성령']],
+ [7,'결혼도 독신도 각 사람의 ___에 따른 자리예요.',['은사']],
+ [7,'주님 안에서 ___을 받은 그 자리 그대로 머물러야 해요.',['부르심']],
+ [7,'부르심을 받은 그 자리 그대로 하나님 앞에서 ___하게 머물러야 해요.',['거룩']],
+ [8,'우상의 ___ 문제에서, 지식은 사람을 우쭐하게 하지만 사랑은 덕을 세워요.',['제물']],
+ [8,'지식은 사람을 우쭐하게 하지만 사랑은 ___을 세워요.',['덕']],
+ [8,'연약한 형제의 ___을 상하게 하는 자유는 자유가 아니에요.',['양심']],
+ [9,'바울은 복음을 위해 자신의 ___도 내려놓았어요.',['권리']],
+ [9,'썩어지지 않는 ___의 관을 얻으려고 육체를 쳐서 복종시켜요.',['승리']],
+ [9,'썩지 않는 관을 얻으려고 육체를 쳐서 ___시켜요.',['복종']],
+ [10,'이스라엘의 역사는 우리의 ___이에요.',['거울','본보기']],
+ [10,'그래서 우상을 ___지 말라고 했어요.',['섬기','숭배','숭배하','섬기지','숭배하지']],
+ [10,'우상을 섬기지 말고, ___하지 말라고 했어요.',['음행']],
+ [11,'예배에서는 창조의 ___를 따라야 해요.',['질서','머리']],
+ [11,'주의 ___은 주의 죽으심을 나타내는 거룩한 식탁이에요.',['만찬']],
+ [11,'주께서 ___ 때까지 이를 행해요.',['오실']],
+ [12,'은사는 여러 가지이나 ___은 같아요.',['성령']],
+ [12,'몸은 ___이지만 지체는 많아요.',['하나']],
+ [12,'너희는 그리스도의 ___이고, 지체의 각 부분이에요.',['몸']],
+ [13,'사랑은 오래 ___고 온유해요.',['참','참는']],
+ [13,'사랑은 오래 참고 온유하며, ___하지 아니해요.',['시기']],
+ [13,'은사도 지식도 잠깐이지만 사랑은 ___해요.',['영원','언제까지나']],
+ [14,'___은 방언보다 나아요.',['예언']],
+ [14,'예언은 교회를 세우는 ___을 주기 때문이에요.',['덕']],
+ [14,'모든 것을 품위와 ___ 가운데 행하라고 했어요.',['질서']],
+ [15,'그리스도는 잠자는 자들의 ___가 되셨어요.',['첫 열매','첫열매']],
+ [15,'아담 안에서 모든 사람이 ___ 것같이, 그리스도 안에서 모든 사람이 살아나요.',['죽은']],
+ [15,'우리 주 예수 그리스도로 말미암아 하나님이 우리에게 ___를 주세요.',['승리']],
+ [16,'정기 ___과 성도들의 문안, 마지막 권면이 나와요.',['헌금','연보']],
+ [16,'깨어 있고 ___하여, 모든 일을 사랑으로 행하라고 해요.',['강건']],
+ [16,'모든 일을 ___으로 행하라는 말로 끝맺어요.',['사랑']]
+];
+const STORY = [
+ [1,1,'고린도 교회가 갈라졌다는 소식은 ___의 집 사람들이 전해 주었어요.',['글로에']],
+ [1,1,'성도들은 “나는 ___에게, 나는 아볼로에게, 나는 게바에게, 나는 그리스도에게 속했다”며 편을 갈랐어요.',['바울']],
+ [1,1,'“나는 바울에게, 나는 ___에게, 나는 게바에게, 나는 그리스도에게 속했다”',['아볼로']],
+ [1,1,'“나는 바울에게, 나는 아볼로에게, 나는 ___에게, 나는 그리스도에게 속했다”',['게바']],
+ [1,1,'“나는 바울에게, 나는 아볼로에게, 나는 게바에게, 나는 ___에게 속했다”',['그리스도']],
+ [1,1,'바울이 침례를 준 사람은 ___와 가이오, 그리고 스데바나의 집뿐이었어요.',['그리스보']],
+ [1,1,'바울이 침례를 준 사람은 그리스보와 ___, 그리고 스데바나의 집뿐이었어요.',['가이오']],
+ [1,1,'바울이 침례를 준 사람은 그리스보와 가이오, 그리고 ___의 집뿐이었어요.',['스데바나']],
+ [1,1,'이 편지는 바울이 형제 ___와 함께 보냈어요.',['소스데네']],
+ [2,4,'바울은 성도들이 자신을 본받게 하려고 ___를 보냈어요.',['디모데']],
+ [2,5,'음행한 사람에 대해 바울은 그를 ___에게 내주었다고 말해요.',['사탄']],
+ [2,9,'바울은 다른 사도들과 주의 형제들과 ___처럼 아내를 데리고 다닐 권리가 있다고 해요.',['게바']],
+ [2,9,'바울은 자기와 ___만 일하지 않을 권리가 없느냐고 물어요.',['바나바']],
+ [2,9,'곡식을 떠는 ___에게 망을 씌우지 말라는 모세의 율법을 근거로 들어요.',['소']],
+ [3,10,'이스라엘 조상들은 모두 ___ 아래 있었어요.',['구름']],
+ [3,10,'조상들은 ___ 가운데로 지나며 모세에게 속하여 침례를 받았어요.',['바다']],
+ [3,10,'조상들은 바다 가운데로 지나며 ___에게 속하여 침례를 받았어요.',['모세']],
+ [3,10,'그들이 마신 신령한 반석은 바로 ___였어요.',['그리스도']],
+ [3,10,'음행하다가 하루에 ___명이 죽었어요.',['23000','이만삼천','2만3천','이만 삼천']],
+ [3,10,'하나님은 감당할 수 있는 시험만 허락하시고 ___을 내 주세요.',['피할 길','피할길']],
+ [4,12,'하나님은 교회에 첫째는 ___를 세우셨어요.',['사도']],
+ [4,12,'하나님은 교회에 첫째는 사도, 둘째는 ___를 세우셨어요.',['선지자']],
+ [4,12,'첫째는 사도, 둘째는 선지자, 셋째는 ___를 세우셨어요.',['교사']],
+ [4,13,'항상 있을 믿음·소망·사랑은 ___ 가지예요.',['세','3','셋','세가지']],
+ [4,13,'믿음·소망·사랑, 그중 제일은 ___이에요.',['사랑']],
+ [4,14,'깨달은 마음으로 하는 ___ 마디 말이 방언으로 하는 일만 마디 말보다 나아요.',['다섯','5']],
+ [4,14,'깨달은 마음으로 하는 다섯 마디 말이 방언으로 하는 ___ 마디 말보다 나아요.',['일만','10000','만']],
+ [4,14,'방언은 ___ 사람이나 많아야 세 사람이 차례로 해요.',['두','2','둘']],
+ [4,14,'방언은 두 사람이나 많아야 ___ 사람이 차례로 해요.',['세','3','셋']],
+ [4,14,'방언을 할 때는 한 사람이 ___해야 해요.',['통역']],
+ [5,15,'그리스도는 죽으시고 묻히셨다가 ___ 만에 다시 살아나셨어요.',['사흘','3일','삼일']],
+ [5,15,'부활하신 주님은 먼저 ___에게 보이셨어요.',['게바']],
+ [5,15,'주님은 먼저 게바에게, 다음에 ___에게 보이셨어요.',['열두 제자','열두제자','열두','12제자']],
+ [5,15,'그 후 ___ 형제에게 한꺼번에 보이셨어요.',['오백여','오백','500','500여']],
+ [5,15,'이어서 ___에게, 모든 사도에게 보이셨어요.',['야고보']],
+ [5,15,'맨 나중에 ___에게도 보이셨어요.',['바울']],
+ [5,15,'부활의 소망이 없다면 ___에서 맹수와 싸운 것이 무슨 유익이냐고 말해요.',['에베소']],
+ [5,15,'부활의 소망이 없다면 에베소에서 ___와 싸운 것이 무슨 유익이냐고 말해요.',['맹수']],
+ [6,16,'연보는 ___ 교회들에게 명한 것처럼 모아 두라고 했어요.',['갈라디아']],
+ [6,16,'연보는 매주 ___에 모아 두라고 했어요.',['첫날','첫 날','첫째 날']],
+ [6,16,'모은 연보를 ___으로 보내려 했어요.',['예루살렘']],
+ [6,16,'바울은 ___를 지나 고린도로 가려 했어요.',['마게도냐']],
+ [6,16,'바울은 ___까지는 에베소에 머물 계획이었어요.',['오순절']],
+ [6,16,'바울은 오순절까지 ___에 머물 계획이었어요. 큰 사역의 문이 열렸기 때문이에요.',['에베소']],
+ [6,16,'___의 집은 아가야의 첫 열매였어요.',['스데바나']],
+ [6,16,'스데바나의 집은 ___의 첫 열매였어요.',['아가야']],
+ [6,16,'스데바나와 ___, 아가이고가 찾아와 바울을 기쁘게 했어요.',['브드나도']],
+ [6,16,'스데바나와 브드나도, ___가 찾아와 바울을 기쁘게 했어요.',['아가이고']],
+ [6,16,'마지막으로 ___의 교회들이 문안해요.',['아시아']],
+ [6,16,'___와 브리스가, 그 집에 있는 교회가 문안해요.',['아굴라']],
+ [6,16,'아굴라와 ___, 그 집에 있는 교회가 문안해요.',['브리스가']]
+];
+const SCENES = {1:'갈라진 교회',2:'바울의 사역과 권리',3:'광야의 조상들',4:'은사와 예배의 질서',5:'부활의 증인들',6:'바울의 계획과 인사'};
+const Q = [];
+SUMMARY.forEach(([c,t,a],i)=>Q.push({id:'s'+i, set:'summary', where:c+'장 요약', t, a}));
+STORY.forEach(([sc,c,t,a],i)=>Q.push({id:'p'+i, set:'story', where:'장면 '+sc+' · '+SCENES[sc]+' ('+c+'장)', t, a}));
+const QMAP = Object.fromEntries(Q.map(q=>[q.id,q]));
+
+// ── 저장 ─────────────────────────────────────────
+const KEY = 'cor1-quiz-v1';
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+let S = load();   // {set, queue, idx, round, res:{id:true/false}, answered:{id:'입력'}, everWrong:{id:n}, stage}
+let pick = {set:'all', shuffle:true};
+
+const norm = s => s.normalize('NFC').replace(/[\s.,·~\-()"'“”‘’!?명]/g,'').toLowerCase();
+const isRight = (q,input) => { const n = norm(input); return n.length>0 && q.a.some(x => norm(x)===n); };
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+const app = document.getElementById('app');
+const count = set => Q.filter(q=>set==='all'||q.set===set).length;
+
+// ── 시작 화면 ───────────────────────────────────────
+function renderHome(){
+  const inProgress = S && S.stage==='quiz';
+  const sets = [['all','전체 문제'],['summary','장별 요약 빈칸'],['story','인물·장소·숫자']];
+  app.innerHTML = `
+    <h1>고린도전서<br>성경퀴즈 연습</h1>
+    <p class="sub">빈칸에 들어갈 말을 적고 확인하세요. 다 풀고 나면 틀린 문제만 다시 풀 수 있어요.</p>
+    ${inProgress ? `<div class="panel resume">
+      <p>${S.round>1?S.round+'회차 ':''}${S.idx+1}번째 문제까지 풀던 기록이 있어요. (총 ${S.queue.length}문제)</p>
+      <button class="btn" id="resume">이어서 풀기</button></div>` : ''}
+    <div role="group" aria-label="문제 범위">
+      ${sets.map(([k,l])=>`<button class="choice" data-set="${k}" aria-pressed="${pick.set===k}"><b>${l}</b><span>${count(k)}문제</span></button>`).join('')}
+    </div>
+    <label class="toggle"><input type="checkbox" id="shuf" ${pick.shuffle?'checked':''}> 문제 순서 섞기</label>
+    <button class="btn ${inProgress?'ghost':''}" id="start">${inProgress?'새로 시작하기':'시작하기'}</button>`;
+  app.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{pick.set=b.dataset.set;renderHome();});
+  app.querySelector('#shuf').onchange = e => pick.shuffle = e.target.checked;
+  app.querySelector('#start').onclick = startNew;
+  const r = app.querySelector('#resume'); if(r) r.onclick = renderQuiz;
+}
+function startNew(){
+  const ids = Q.filter(q=>pick.set==='all'||q.set===pick.set).map(q=>q.id);
+  S = {set:pick.set, shuffle:pick.shuffle, queue: pick.shuffle?shuffle(ids):ids, idx:0, round:1, res:{}, answered:{}, everWrong:{}, stage:'quiz'};
+  save(); renderQuiz();
+}
+
+// ── 문제 화면 ───────────────────────────────────────
+function verseHTML(q, state, fill){
+  const slot = state ? `<span class="slot ${state}">${esc(fill)}</span>` : `<span class="slot" aria-label="빈칸">&nbsp;?&nbsp;</span>`;
+  return esc(q.t).replace('___', slot);
+}
+function renderQuiz(){
+  if(S.idx >= S.queue.length){ finishRound(); return; }
+  const q = QMAP[S.queue[S.idx]];
+  const done = q.id in S.res;
+  const total = S.queue.length;
+  const pct = ((S.idx + (done?1:0)) / total) * 100;
+  app.innerHTML = `
+    <div class="top"><span>${S.idx+1} / ${total}${S.round>1?`<span class="round">틀린 문제 ${S.round-1}차 복습</span>`:''}</span>
+      <button class="link" id="home">처음 화면</button></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="where">${q.where}</div>
+    <p class="verse" id="verse">${done ? verseHTML(q, S.res[q.id]?'ok':'bad', q.a[0]) : verseHTML(q)}</p>
+    <input class="answer" id="ans" type="text" autocomplete="off" autocapitalize="off" enterkeyhint="done"
+      placeholder="빈칸에 들어갈 말" aria-label="정답 입력" ${done?'disabled':''} value="${done?esc(S.answered[q.id]||''):''}">
+    <div id="fb"></div>
+    <button class="btn" id="go">${done?'다음 문제':'확인'}</button>`;
+  app.querySelector('#home').onclick = renderHome;
+  const inp = app.querySelector('#ans'), go = app.querySelector('#go');
+  if(done) showFeedback(q); else setTimeout(()=>inp.focus(), 50);
+  const act = () => { if(q.id in S.res){ S.idx++; save(); renderQuiz(); } else check(q); };
+  go.onclick = act;
+  inp.onkeydown = e => { if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); act(); } };
+  document.onkeydown = e => { if(e.key==='Enter' && (q.id in S.res) && document.activeElement!==inp){ e.preventDefault(); act(); } };
+}
+function check(q){
+  const inp = app.querySelector('#ans');
+  const v = inp.value.trim();
+  if(!v){ inp.focus(); return; }
+  const ok = isRight(q, v);
+  S.res[q.id] = ok; S.answered[q.id] = v;
+  if(!ok) S.everWrong[q.id] = (S.everWrong[q.id]||0)+1;
+  save(); renderQuiz();
+}
+function showFeedback(q){
+  const ok = S.res[q.id];
+  const alt = q.a.length>1 ? ` <span class="mine">(인정: ${q.a.slice(1).map(esc).join(', ')})</span>` : '';
+  const fb = app.querySelector('#fb');
+  fb.innerHTML = ok
+    ? `<div class="fb ok"><strong>맞았어요</strong>정답: ${esc(q.a[0])}${alt}</div>`
+    : `<div class="fb bad"><strong>틀렸어요</strong>정답: ${esc(q.a[0])}${alt}
+        <div class="mine">내가 쓴 답: ${esc(S.answered[q.id]||'')}</div>
+        <button class="link" id="override">오타라서 맞은 걸로 할게요</button></div>`;
+  const o = fb.querySelector('#override');
+  if(o) o.onclick = () => {
+    S.res[q.id] = true;
+    S.everWrong[q.id] = Math.max(0,(S.everWrong[q.id]||1)-1);
+    save(); renderQuiz();
+  };
+  app.querySelector('#go').focus();
+}
+
+// ── 결과 화면 ───────────────────────────────────────
+function finishRound(){
+  document.onkeydown = null;
+  const wrong = S.queue.filter(id=>!S.res[id]);
+  const right = S.queue.length - wrong.length;
+  S.stage = 'result'; save();
+  app.innerHTML = `
+    <div class="top"><span>${S.round===1?'1회차 결과':`틀린 문제 ${S.round-1}차 복습 결과`}</span>
+      <button class="link" id="home">처음 화면</button></div>
+    <div class="score">${right}<small> / ${S.queue.length}</small></div>
+    <p class="sub">${wrong.length ? `${wrong.length}문제를 틀렸어요.` : '모두 맞혔어요.'}</p>
+    ${wrong.length ? `
+      <button class="btn" id="retry">틀린 ${wrong.length}문제 다시 풀기</button>
+      <ul class="wrong-list">${wrong.map(id=>{const q=QMAP[id];return `<li>
+        <div class="w">${q.where}</div>
+        ${esc(q.t).replace('___', `<span class="a">${esc(q.a[0])}</span>`)}
+        <div class="w">내가 쓴 답: ${esc(S.answered[id]||'')}</div></li>`}).join('')}</ul>`
+    : `<div class="allclear">${S.round>1?'틀렸던 문제까지 모두 맞혔어요. 이제 전체 범위를 한 번 더 풀어 보세요.':'처음부터 끝까지 전부 맞혔어요.'}</div>`}
+    <button class="btn ghost" id="again">전체 다시 풀기</button>`;
+  app.querySelector('#home').onclick = renderHome;
+  app.querySelector('#again').onclick = () => { pick.set = S.set; pick.shuffle = S.shuffle; startNew(); };
+  const r = app.querySelector('#retry');
+  if(r) r.onclick = () => {
+    S.queue = S.shuffle ? shuffle(wrong) : wrong;
+    S.idx = 0; S.round++; S.res = {}; S.answered = {}; S.stage = 'quiz';
+    save(); renderQuiz();
+  };
+  window.scrollTo(0,0);
+}
+
+// ── 시작 ─────────────────────────────────────────
+if(S && S.stage==='result') finishRound(); else renderHome();
+</script>
+</body>
+</html>

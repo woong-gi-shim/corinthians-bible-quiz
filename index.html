@@ -88,6 +88,31 @@ h1{font-family:"Gowun Batang",serif;font-weight:700;font-size:1.9rem;line-height
 .wrong-list .a{color:var(--accent);font-weight:600}
 .allclear{background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:16px;margin:20px 0}
 .hidden{display:none}
+h2{font-size:1.02rem;font-weight:600;margin:26px 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+h2 span{font-weight:400;color:var(--muted);font-size:.88rem}
+.grid{display:grid;gap:8px}
+.grid.ch{grid-template-columns:repeat(4,1fr)}
+.grid.sc{grid-template-columns:repeat(2,1fr)}
+.chip{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 6px;font:inherit;color:inherit;
+  cursor:pointer;text-align:center;line-height:1.3}
+.chip.wide{grid-column:1/-1;display:flex;justify-content:space-between;padding:12px 14px}
+.chip.wide span{color:var(--muted);font-size:.9rem}
+.grid.sc .chip{text-align:left;padding:10px 12px}
+.chip small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent);font-weight:600}
+.chip:focus-visible{outline:3px solid var(--slot);outline-offset:2px}
+.verses{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--slot);border-radius:12px;padding:16px 16px 12px}
+.verses h3{font-family:"Gowun Batang",serif;font-size:1.15rem;margin:0 0 4px}
+.verses p{margin:0 0 12px;color:var(--muted);font-size:.88rem}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+.vrow{display:flex;gap:10px;padding:7px 4px;border-top:1px solid var(--line);font-size:.93rem}
+.vrow b{min-width:2.6em;color:var(--slot);font-weight:600}
+.vrow.on{background:var(--slot-bg);border-radius:6px}
+.keyv{margin-top:18px;padding:12px 14px;border-left:4px solid var(--slot);background:var(--slot-bg);border-radius:8px;font-size:.92rem}
+.keyv b{color:var(--slot)}
+.startbar{position:sticky;bottom:0;margin:20px -18px -40px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));
+  background:var(--bg);border-top:1px solid var(--line)}
+.startbar .toggle{margin:0 2px 12px}
 @media (prefers-reduced-motion: reduce){.bar i{transition:none}}
 </style>
 </head>
@@ -201,9 +226,27 @@ const STORY = [
 ];
 const SCENES = {1:'갈라진 교회',2:'바울의 사역과 권리',3:'광야의 조상들',4:'은사와 예배의 질서',5:'부활의 증인들',6:'바울의 계획과 인사'};
 const Q = [];
-SUMMARY.forEach(([c,t,a],i)=>Q.push({id:'s'+i, set:'summary', where:c+'장 요약', t, a}));
-STORY.forEach(([sc,c,t,a],i)=>Q.push({id:'p'+i, set:'story', where:'장면 '+sc+' · '+SCENES[sc]+' ('+c+'장)', t, a}));
+SUMMARY.forEach(([c,t,a],i)=>Q.push({id:'s'+i, set:'summary', ch:c, where:c+'장 요약', t, a}));
+STORY.forEach(([sc,c,t,a],i)=>Q.push({id:'p'+i, set:'story', sc, ch:c, where:'장면 '+sc+' · '+SCENES[sc]+' ('+c+'장)', t, a}));
 const QMAP = Object.fromEntries(Q.map(q=>[q.id,q]));
+const VERSES = {1:'15, 18, 29',2:'4, 10, 14',3:'12-13, 16, 18',4:'2, 16-17, 20',5:'8, 11, 13',6:'9-10, 13, 18',
+  7:'5, 23, 28',8:'1, 13',9:'4-6, 11, 19, 27',10:'8, 16, 31',11:'3, 30',12:'8-10, 15-21, 27',
+  13:'4, 4-7, 13',14:'4, 20, 26',15:'9, 13, 42-44',16:'5, 13-14, 17'};
+// 범위: all | summary | story | c<n> (장별 요약 n장) | sc<n> (인물·장소·숫자 장면 n)
+function inSet(q,set){
+  if(set==='all') return true;
+  if(set==='summary'||set==='story') return q.set===set;
+  if(set.startsWith('sc')) return q.set==='story' && q.sc===+set.slice(2);
+  if(set.startsWith('c'))  return q.set==='summary' && q.ch===+set.slice(1);
+  return false;
+}
+function setLabel(set){
+  if(set==='all') return '전체 문제';
+  if(set==='summary') return '장별 요약 빈칸 전체';
+  if(set==='story') return '인물·장소·숫자 전체';
+  if(set.startsWith('sc')) return '인물·장소·숫자 장면 '+set.slice(2);
+  return '장별 요약 빈칸 '+set.slice(1)+'장';
+}
 
 // ── 저장 ─────────────────────────────────────────
 const KEY = 'cor1-quiz-v1';
@@ -212,7 +255,7 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} 
 function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
 
 let S = load();   // {set, queue, idx, round, res:{id:true/false}, answered:{id:'입력'}, everWrong:{id:n}, stage}
-let pick = {set:'all', shuffle:true};
+let pick = {set:(S&&S.set)||'all', shuffle:S?S.shuffle!==false:true};
 
 const norm = s => s.normalize('NFC').replace(/[\s.,·~\-()"'“”‘’!?명]/g,'').toLowerCase();
 const isRight = (q,input) => { const n = norm(input); return n.length>0 && q.a.some(x => norm(x)===n); };
@@ -220,30 +263,59 @@ const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c
 function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
 const app = document.getElementById('app');
-const count = set => Q.filter(q=>set==='all'||q.set===set).length;
+const count = set => Q.filter(q=>inSet(q,set)).length;
 
 // ── 시작 화면 ───────────────────────────────────────
 function renderHome(){
-  const inProgress = S && S.stage==='quiz';
-  const sets = [['all','전체 문제'],['summary','장별 요약 빈칸'],['story','인물·장소·숫자']];
+  document.onkeydown = null;
+  const inProgress = S && S.stage==='quiz' && S.idx>0;
+  const on = k => pick.set===k;
+  const selCh = pick.set.startsWith('c') ? +pick.set.slice(1) : 0;
+  const chips = [];
+  for(let c=1;c<=16;c++) chips.push(`<button class="chip" data-set="c${c}" aria-pressed="${on('c'+c)}">${c}장</button>`);
+  const scenes = [];
+  for(let n=1;n<=6;n++) scenes.push(`<button class="chip" data-set="sc${n}" aria-pressed="${on('sc'+n)}">장면 ${n}<small>${SCENES[n]} · ${count('sc'+n)}문제</small></button>`);
+  const vrows = Object.keys(VERSES).map(c=>`<div class="vrow ${selCh==+c?'on':''}"><b>${c}장</b><span>${VERSES[c]}절</span></div>`).join('');
   app.innerHTML = `
     <h1>고린도전서<br>성경퀴즈 연습</h1>
     <p class="sub">빈칸에 들어갈 말을 적고 확인하세요. 다 풀고 나면 틀린 문제만 다시 풀 수 있어요.</p>
     ${inProgress ? `<div class="panel resume">
-      <p>${S.round>1?S.round+'회차 ':''}${S.idx+1}번째 문제까지 풀던 기록이 있어요. (총 ${S.queue.length}문제)</p>
+      <p>풀던 기록이 있어요: ${setLabel(S.set)}${S.round>1?` (틀린 문제 ${S.round-1}차 복습)`:''}, ${S.idx} / ${S.queue.length}문제</p>
       <button class="btn" id="resume">이어서 풀기</button></div>` : ''}
-    <div role="group" aria-label="문제 범위">
-      ${sets.map(([k,l])=>`<button class="choice" data-set="${k}" aria-pressed="${pick.set===k}"><b>${l}</b><span>${count(k)}문제</span></button>`).join('')}
+    <button class="choice" data-set="all" aria-pressed="${on('all')}"><b>전체 문제</b><span>${count('all')}문제</span></button>
+
+    <h2>장별 요약 빈칸</h2>
+    <div class="grid ch">
+      <button class="chip wide" data-set="summary" aria-pressed="${on('summary')}">1~16장 전체<span>${count('summary')}문제</span></button>
+      ${chips.join('')}
     </div>
-    <label class="toggle"><input type="checkbox" id="shuf" ${pick.shuffle?'checked':''}> 문제 순서 섞기</label>
-    <button class="btn ${inProgress?'ghost':''}" id="start">${inProgress?'새로 시작하기':'시작하기'}</button>`;
-  app.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{pick.set=b.dataset.set;renderHome();});
+
+    <h2>인물·장소·숫자</h2>
+    <div class="grid sc">
+      <button class="chip wide" data-set="story" aria-pressed="${on('story')}">장면 1~6 전체<span>${count('story')}문제</span></button>
+      ${scenes.join('')}
+    </div>
+
+    <section class="verses" aria-label="핵심 구절">
+      <h3>핵심 구절</h3>
+      <p>성경을 펴서 직접 찾아 읽으세요. 빈칸 문제와 암송 문제는 이 구절들에서 많이 나옵니다.</p>
+      <div class="vgrid">${vrows}</div>
+    </section>
+
+    <div class="startbar">
+      <label class="toggle"><input type="checkbox" id="shuf" ${pick.shuffle?'checked':''}> 문제 순서 섞기</label>
+      <button class="btn" id="start">${setLabel(pick.set)} 시작하기 (${count(pick.set)}문제)</button>
+    </div>`;
+  app.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{pick.set=b.dataset.set;renderHome();});
   app.querySelector('#shuf').onchange = e => pick.shuffle = e.target.checked;
-  app.querySelector('#start').onclick = startNew;
+  app.querySelector('#start').onclick = () => {
+    if(inProgress && !confirm('풀던 기록이 지워지고 새로 시작해요. 계속할까요?')) return;
+    startNew();
+  };
   const r = app.querySelector('#resume'); if(r) r.onclick = renderQuiz;
 }
 function startNew(){
-  const ids = Q.filter(q=>pick.set==='all'||q.set===pick.set).map(q=>q.id);
+  const ids = Q.filter(q=>inSet(q,pick.set)).map(q=>q.id);
   S = {set:pick.set, shuffle:pick.shuffle, queue: pick.shuffle?shuffle(ids):ids, idx:0, round:1, res:{}, answered:{}, everWrong:{}, stage:'quiz'};
   save(); renderQuiz();
 }
@@ -268,7 +340,8 @@ function renderQuiz(){
     <input class="answer" id="ans" type="text" autocomplete="off" autocapitalize="off" enterkeyhint="done"
       placeholder="빈칸에 들어갈 말" aria-label="정답 입력" ${done?'disabled':''} value="${done?esc(S.answered[q.id]||''):''}">
     <div id="fb"></div>
-    <button class="btn" id="go">${done?'다음 문제':'확인'}</button>`;
+    <button class="btn" id="go">${done?'다음 문제':'확인'}</button>
+    <div class="keyv"><b>${q.ch}장 핵심 구절</b> ${VERSES[q.ch]}절</div>`;
   app.querySelector('#home').onclick = renderHome;
   const inp = app.querySelector('#ans'), go = app.querySelector('#go');
   if(done) showFeedback(q); else setTimeout(()=>inp.focus(), 50);
@@ -311,7 +384,7 @@ function finishRound(){
   const right = S.queue.length - wrong.length;
   S.stage = 'result'; save();
   app.innerHTML = `
-    <div class="top"><span>${S.round===1?'1회차 결과':`틀린 문제 ${S.round-1}차 복습 결과`}</span>
+    <div class="top"><span>${setLabel(S.set)} ${S.round===1?'결과':`틀린 문제 ${S.round-1}차 복습 결과`}</span>
       <button class="link" id="home">처음 화면</button></div>
     <div class="score">${right}<small> / ${S.queue.length}</small></div>
     <p class="sub">${wrong.length ? `${wrong.length}문제를 틀렸어요.` : '모두 맞혔어요.'}</p>
@@ -322,7 +395,7 @@ function finishRound(){
         ${esc(q.t).replace('___', `<span class="a">${esc(q.a[0])}</span>`)}
         <div class="w">내가 쓴 답: ${esc(S.answered[id]||'')}</div></li>`}).join('')}</ul>`
     : `<div class="allclear">${S.round>1?'틀렸던 문제까지 모두 맞혔어요. 이제 전체 범위를 한 번 더 풀어 보세요.':'처음부터 끝까지 전부 맞혔어요.'}</div>`}
-    <button class="btn ghost" id="again">전체 다시 풀기</button>`;
+    <button class="btn ghost" id="again">${setLabel(S.set)} 처음부터 다시 풀기</button>`;
   app.querySelector('#home').onclick = renderHome;
   app.querySelector('#again').onclick = () => { pick.set = S.set; pick.shuffle = S.shuffle; startNew(); };
   const r = app.querySelector('#retry');

@@ -105,11 +105,16 @@ h2 span{font-weight:400;color:var(--muted);font-size:.88rem}
 .verses h3{font-family:"Gowun Batang",serif;font-size:1.15rem;margin:0 0 4px}
 .verses p{margin:0 0 12px;color:var(--muted);font-size:.88rem}
 .vgrid{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
-.vrow{display:flex;gap:10px;padding:7px 4px;border-top:1px solid var(--line);font-size:.93rem}
+.vrow{display:flex;gap:10px;align-items:baseline;padding:9px 4px;border-top:1px solid var(--line);font-size:.93rem;color:inherit;text-decoration:none}
+.vrow span{flex:1}
+.vrow i{font-style:normal;color:var(--muted);font-size:.8rem}
+.vrow:active{background:var(--slot-bg)}
 .vrow b{min-width:2.6em;color:var(--slot);font-weight:600}
 .vrow.on{background:var(--slot-bg);border-radius:6px}
-.keyv{margin-top:18px;padding:12px 14px;border-left:4px solid var(--slot);background:var(--slot-bg);border-radius:8px;font-size:.92rem}
+.keyv{display:flex;justify-content:space-between;align-items:center;gap:10px;color:inherit;text-decoration:none;margin-top:18px;padding:12px 14px;border-left:4px solid var(--slot);background:var(--slot-bg);border-radius:8px;font-size:.92rem}
 .keyv b{color:var(--slot)}
+.keyv .open{white-space:nowrap;font-size:.85rem;color:var(--muted)}
+.note{color:var(--muted);font-size:.88rem;margin:-4px 0 10px}
 .startbar{position:sticky;bottom:0;margin:20px -18px -40px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));
   background:var(--bg);border-top:1px solid var(--line)}
 .startbar .toggle{margin:0 2px 12px}
@@ -224,10 +229,78 @@ const STORY = [
  [6,16,'___와 브리스가, 그 집에 있는 교회가 문안해요.',['아굴라']],
  [6,16,'아굴라와 ___, 그 집에 있는 교회가 문안해요.',['브리스가']]
 ];
+
+// 핵심 구절 빈칸: 문장은 풀어 쓴 것, 정답 단어는 개역개정 기준
+const KEYQ = [
+ [1,'1:15','바울이 몇 사람에게만 세례를 준 것은, 누구도 자기 ___으로 세례받았다고 말하지 못하게 하려는 것이었어요.',['이름']],
+ [1,'1:18','멸망하는 자들에게 십자가의 도는 ___ 것으로 보여요.',['미련한','미련']],
+ [1,'1:18','구원받는 우리에게 십자가의 도는 하나님의 ___이에요.',['능력']],
+ [1,'1:29','어떤 육체도 하나님 앞에서 ___하지 못하게 하셨어요.',['자랑']],
+ [2,'2:4','바울은 설득력 있는 지혜의 말이 아니라 성령의 ___과 능력으로 전했어요.',['나타나심','나타남']],
+ [2,'2:10','성령은 모든 것, 곧 하나님의 ___까지도 통달하세요.',['깊은 것','깊은것']],
+ [2,'2:14','육에 속한 사람에게 성령의 일이 어리석게 보이는 것은, 그 일들이 ___으로 분별되기 때문이에요.',['영적','영적으로']],
+ [3,'3:12','이 터 위에는 금, 은, 보석으로도, 나무, 풀, ___으로도 세울 수 있어요.',['짚']],
+ [3,'3:13','각 사람의 공적이 어떠한지는 ___로 드러나고 시험받아요.',['불']],
+ [3,'3:16','너희 안에는 하나님의 ___이 계세요.',['성령']],
+ [3,'3:18','이 세상에서 스스로 지혜롭다고 여기는 사람은 먼저 ___ 자가 되어야 지혜로운 자가 돼요.',['어리석은']],
+ [4,'4:2','맡은 자들에게 요구되는 것은 ___이에요.',['충성']],
+ [4,'4:16','바울은 성도들에게 자기를 ___ 자가 되라고 권했어요.',['본받는','본받는 자']],
+ [4,'4:17','바울은 주 안에서 사랑하고 신실한 아들 ___를 고린도에 보냈어요.',['디모데']],
+ [4,'4:20','하나님의 나라는 말이 아니라 ___에 있어요.',['능력']],
+ [5,'5:8','명절은 묵은 누룩이 아니라 순전함과 ___의 떡으로 지키자고 해요.',['진실함','진실']],
+ [5,'5:11','형제라 불리면서 음행이나 탐욕에 빠진 사람과는 사귀지도, 함께 ___ 말라고 해요.',['먹지도','먹지']],
+ [5,'5:13','교회 밖 사람은 하나님이 심판하시지만, 교회 안의 악한 사람은 ___고 해요.',['내쫓으라','내쫓아야 한다','내쫓아라']],
+ [6,'6:9-10','불의한 자는 하나님의 나라를 ___으로 받지 못해요.',['유업']],
+ [6,'6:13','몸은 음란을 위한 것이 아니라 오직 ___를 위하여 있어요.',['주','주님']],
+ [6,'6:18','___을 피하라고 해요. 그 죄는 자기 몸에 짓는 죄이기 때문이에요.',['음행']],
+ [7,'7:5','부부가 분방하는 것은 ___할 틈을 얻기 위해 합의하여 잠시만 하라고 해요.',['기도']],
+ [7,'7:5','다시 합하라고 한 것은 절제하지 못해 ___이 시험하지 못하게 하려는 거예요.',['사탄']],
+ [7,'7:23','너희는 ___으로 사신 사람들이니 사람의 종이 되지 말라고 해요.',['값']],
+ [7,'7:28','장가가거나 시집가는 것은 ___ 짓는 일이 아니에요.',['죄']],
+ [8,'8:1','지식은 사람을 ___하게 하지만 사랑은 덕을 세워요.',['교만']],
+ [8,'8:13','음식이 형제를 ___하게 한다면 바울은 영원히 고기를 먹지 않겠다고 해요.',['실족']],
+ [9,'9:4','바울은 자기에게 먹고 ___ 권리가 없겠느냐고 물어요.',['마실']],
+ [9,'9:11','신령한 것을 뿌린 바울이 성도들의 ___인 것을 거두는 게 지나치냐고 물어요.',['육적']],
+ [9,'9:19','바울은 모든 사람에게서 자유롭지만 스스로 모든 사람의 ___이 되었어요.',['종']],
+ [9,'9:19','바울이 스스로 종이 된 것은 더 많은 사람을 ___기 위해서예요.',['얻','얻고자','얻으']],
+ [9,'9:27','바울이 몸을 쳐 복종시키는 것은, 남에게 전한 뒤 자신이 ___을 당할까 두려워서예요.',['버림']],
+ [10,'10:8','이스라엘처럼 ___하지 말자고 해요. 그들 중 하루에 이만 삼천 명이 죽었기 때문이에요.',['음행']],
+ [10,'10:16','축복의 잔은 그리스도의 ___에 참여하는 거예요.',['피']],
+ [10,'10:16','우리가 떼는 떡은 그리스도의 ___에 참여하는 거예요.',['몸']],
+ [10,'10:31','먹고 마시는 일을 포함해 무엇을 하든 모두 하나님의 ___을 위해 하라고 해요.',['영광']],
+ [11,'11:3','각 남자의 머리는 ___예요.',['그리스도']],
+ [11,'11:3','그리스도의 머리는 ___이세요.',['하나님']],
+ [11,'11:30','주의 만찬을 합당하지 않게 먹어 약한 자와 병든 자가 많고, ___ 자도 적지 않아요.',['잠자는']],
+ [12,'12:8','성령은 어떤 이에게 지혜의 말씀을, 어떤 이에게 ___의 말씀을 주세요.',['지식']],
+ [12,'12:10','성령의 은사 중에는 영들을 ___하는 은사가 있어요.',['분별']],
+ [12,'12:10','각종 방언 말함과 함께 방언들을 ___하는 은사도 있어요.',['통역']],
+ [12,'12:15','발이 자기는 ___이 아니라서 몸에 붙지 않았다고 해도, 몸에 붙지 않은 게 아니에요.',['손']],
+ [12,'12:17','온 몸이 ___이라면 듣는 곳은 어디냐고 물어요.',['눈']],
+ [12,'12:18','하나님은 원하시는 대로 ___를 각각 몸에 두셨어요.',['지체']],
+ [12,'12:21','눈이 손에게 너를 ___ 데가 없다고 말할 수 없어요.',['쓸']],
+ [13,'13:4','사랑은 ___하지 않고 교만하지 않아요.',['자랑']],
+ [13,'13:5','사랑은 ___히 행하지 않아요.',['무례']],
+ [13,'13:5','사랑은 자기의 ___을 구하지 않아요.',['유익']],
+ [13,'13:6','사랑은 불의가 아니라 ___와 함께 기뻐해요.',['진리']],
+ [13,'13:7','사랑은 모든 것을 참고, 믿고, 바라고, ___요.',['견디','견뎌','견디어','견디느니라']],
+ [14,'14:4','방언하는 사람은 ___의 덕을 세우고, 예언하는 사람은 교회의 덕을 세워요.',['자기','자신']],
+ [14,'14:20','악에는 ___가 되라고 해요.',['어린 아이','어린아이','아이']],
+ [14,'14:20','지혜에는 ___ 사람이 되라고 해요.',['장성한']],
+ [14,'14:26','모일 때 찬송, 가르침, 계시, 방언, 통역이 있는데, 모든 것을 ___을 세우기 위해 하라고 해요.',['덕']],
+ [15,'15:9','바울은 교회를 박해했던 자신을 사도 중에 가장 ___ 자라고 해요.',['작은']],
+ [15,'15:13','죽은 자의 부활이 없다면 ___도 다시 살아나지 못하셨을 거예요.',['그리스도']],
+ [15,'15:42','썩을 것으로 심고 ___ 것으로 다시 살아나요.',['썩지 아니할','썩지 않을']],
+ [15,'15:43','욕된 것으로 심고 ___ 것으로 다시 살아나요.',['영광스러운']],
+ [15,'15:44','육의 몸으로 심고 ___ 몸으로 다시 살아나요.',['신령한','영의']],
+ [16,'16:5','바울은 ___를 지난 뒤에 고린도에 가려 했어요.',['마게도냐']],
+ [16,'16:13','깨어 ___에 굳게 서서 남자답게 강건하라고 권해요.',['믿음']],
+ [16,'16:17','스데바나와 브드나도와 아가이고가 와서 성도들의 ___ 것을 채워 주었어요.',['부족한']]
+];
 const SCENES = {1:'갈라진 교회',2:'바울의 사역과 권리',3:'광야의 조상들',4:'은사와 예배의 질서',5:'부활의 증인들',6:'바울의 계획과 인사'};
 const Q = [];
 SUMMARY.forEach(([c,t,a],i)=>Q.push({id:'s'+i, set:'summary', ch:c, where:c+'장 요약', t, a}));
 STORY.forEach(([sc,c,t,a],i)=>Q.push({id:'p'+i, set:'story', sc, ch:c, where:'장면 '+sc+' · '+SCENES[sc]+' ('+c+'장)', t, a}));
+KEYQ.forEach(([c,r,t,a],i)=>Q.push({id:'k'+i, set:'key', ch:c, where:'핵심 구절 · 고전 '+r, t, a}));
 const QMAP = Object.fromEntries(Q.map(q=>[q.id,q]));
 const VERSES = {1:'15, 18, 29',2:'4, 10, 14',3:'12-13, 16, 18',4:'2, 16-17, 20',5:'8, 11, 13',6:'9-10, 13, 18',
   7:'5, 23, 28',8:'1, 13',9:'4-6, 11, 19, 27',10:'8, 16, 31',11:'3, 30',12:'8-10, 15-21, 27',
@@ -235,15 +308,19 @@ const VERSES = {1:'15, 18, 29',2:'4, 10, 14',3:'12-13, 16, 18',4:'2, 16-17, 20',
 // 범위: all | summary | story | c<n> (장별 요약 n장) | sc<n> (인물·장소·숫자 장면 n)
 function inSet(q,set){
   if(set==='all') return true;
-  if(set==='summary'||set==='story') return q.set===set;
+  if(set==='summary'||set==='story'||set==='key') return q.set===set;
+  if(set.startsWith('k'))  return q.set==='key' && q.ch===+set.slice(1);
   if(set.startsWith('sc')) return q.set==='story' && q.sc===+set.slice(2);
   if(set.startsWith('c'))  return q.set==='summary' && q.ch===+set.slice(1);
   return false;
 }
+const bibleURL = c => 'https://www.bskorea.or.kr/bible/korbibReadpage.php?version=GAE&book=1co&chap='+c;
 function setLabel(set){
   if(set==='all') return '전체 문제';
   if(set==='summary') return '장별 요약 빈칸 전체';
   if(set==='story') return '인물·장소·숫자 전체';
+  if(set==='key') return '핵심 구절 빈칸 전체';
+  if(set.startsWith('k')) return '핵심 구절 빈칸 '+set.slice(1)+'장';
   if(set.startsWith('sc')) return '인물·장소·숫자 장면 '+set.slice(2);
   return '장별 요약 빈칸 '+set.slice(1)+'장';
 }
@@ -270,12 +347,14 @@ function renderHome(){
   document.onkeydown = null;
   const inProgress = S && S.stage==='quiz' && S.idx>0;
   const on = k => pick.set===k;
-  const selCh = pick.set.startsWith('c') ? +pick.set.slice(1) : 0;
+  const selCh = (pick.set.startsWith('c')||(pick.set.startsWith('k')&&pick.set!=='key')) ? +pick.set.slice(1) : 0;
+  const kchips = [];
+  for(let c=1;c<=16;c++) kchips.push(`<button class="chip" data-set="k${c}" aria-pressed="${on('k'+c)}">${c}장<small>${count('k'+c)}문제</small></button>`);
   const chips = [];
   for(let c=1;c<=16;c++) chips.push(`<button class="chip" data-set="c${c}" aria-pressed="${on('c'+c)}">${c}장</button>`);
   const scenes = [];
   for(let n=1;n<=6;n++) scenes.push(`<button class="chip" data-set="sc${n}" aria-pressed="${on('sc'+n)}">장면 ${n}<small>${SCENES[n]} · ${count('sc'+n)}문제</small></button>`);
-  const vrows = Object.keys(VERSES).map(c=>`<div class="vrow ${selCh==+c?'on':''}"><b>${c}장</b><span>${VERSES[c]}절</span></div>`).join('');
+  const vrows = Object.keys(VERSES).map(c=>`<a class="vrow ${selCh==+c?'on':''}" href="${bibleURL(c)}" target="_blank" rel="noopener"><b>${c}장</b><span>${VERSES[c]}절</span><i aria-hidden="true">↗</i></a>`).join('');
   app.innerHTML = `
     <h1>고린도전서<br>성경퀴즈 연습</h1>
     <p class="sub">빈칸에 들어갈 말을 적고 확인하세요. 다 풀고 나면 틀린 문제만 다시 풀 수 있어요.</p>
@@ -296,9 +375,16 @@ function renderHome(){
       ${scenes.join('')}
     </div>
 
+    <h2>핵심 구절 빈칸</h2>
+    <p class="note">구절 내용을 풀어 쓴 문장이에요. 정답 단어는 개역개정 기준이에요.</p>
+    <div class="grid ch">
+      <button class="chip wide" data-set="key" aria-pressed="${on('key')}">1~16장 전체<span>${count('key')}문제</span></button>
+      ${kchips.join('')}
+    </div>
+
     <section class="verses" aria-label="핵심 구절">
       <h3>핵심 구절</h3>
-      <p>성경을 펴서 직접 찾아 읽으세요. 빈칸 문제와 암송 문제는 이 구절들에서 많이 나옵니다.</p>
+      <p>빈칸 문제와 암송 문제는 이 구절들에서 많이 나옵니다. 장을 누르면 대한성서공회 개역개정 본문이 새 창으로 열려요.</p>
       <div class="vgrid">${vrows}</div>
     </section>
 
@@ -341,7 +427,7 @@ function renderQuiz(){
       placeholder="빈칸에 들어갈 말" aria-label="정답 입력" ${done?'disabled':''} value="${done?esc(S.answered[q.id]||''):''}">
     <div id="fb"></div>
     <button class="btn" id="go">${done?'다음 문제':'확인'}</button>
-    <div class="keyv"><b>${q.ch}장 핵심 구절</b> ${VERSES[q.ch]}절</div>`;
+    <a class="keyv" href="${bibleURL(q.ch)}" target="_blank" rel="noopener"><span><b>${q.ch}장 핵심 구절</b> ${VERSES[q.ch]}절</span><span class="open">본문 보기 ↗</span></a>`;
   app.querySelector('#home').onclick = renderHome;
   const inp = app.querySelector('#ans'), go = app.querySelector('#go');
   if(done) showFeedback(q); else setTimeout(()=>inp.focus(), 50);

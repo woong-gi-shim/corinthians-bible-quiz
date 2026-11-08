@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>X R S T 카운터</title>
+<style>
+:root{
+  --bg:#EDF0EA; --tile:#FFFFFF; --ink:#1E2722; --muted:#5E6B63; --line:#D3DACF; --accent:#2F6B5A;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#141A17; --tile:#1D2521; --ink:#E6ECE7; --muted:#9AA79F; --line:#33403A; --accent:#6FB39C; color-scheme:dark; }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:min(100%,420px)}
+.tile{aspect-ratio:1;border:2px solid var(--line);border-radius:18px;background:var(--tile);color:inherit;
+  font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;user-select:none;transition:transform .08s}
+.tile:active{transform:scale(.96);border-color:var(--accent)}
+.tile:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.letter{font-size:clamp(2.4rem,12vw,3.6rem);font-weight:700;color:var(--accent);line-height:1}
+.num{font-size:clamp(1.6rem,8vw,2.4rem);font-weight:600;font-variant-numeric:tabular-nums}
+.reset{background:none;border:1.5px solid var(--line);border-radius:10px;color:var(--muted);font:inherit;padding:10px 22px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+<button class="reset" id="reset">모두 0으로</button>
+<script>
+const LETTERS = ['X','R','S','T'];
+const KEY = 'xrst-counts';
+let counts;
+try { counts = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { counts = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(counts)); } catch(e) {} };
+
+const grid = document.getElementById('grid');
+LETTERS.forEach(L => {
+  counts[L] = counts[L] || 0;
+  const b = document.createElement('button');
+  b.className = 'tile';
+  b.innerHTML = `<span class="letter">${L}</span><span class="num">${counts[L]}</span>`;
+  b.setAttribute('aria-label', `${L}: ${counts[L]}`);
+  b.onclick = () => {
+    counts[L]++;
+    b.querySelector('.num').textContent = counts[L];
+    b.setAttribute('aria-label', `${L}: ${counts[L]}`);
+    save();
+  };
+  grid.appendChild(b);
+});
+
+document.getElementById('reset').onclick = () => {
+  if (!confirm('모든 숫자를 0으로 되돌릴까요?')) return;
+  LETTERS.forEach(L => counts[L] = 0);
+  save();
+  document.querySelectorAll('.num').forEach(n => n.textContent = 0);
+  document.querySelectorAll('.tile').forEach((b, i) => b.setAttribute('aria-label', `${LETTERS[i]}: 0`));
+};
+</script>
+</body>
+</html>
